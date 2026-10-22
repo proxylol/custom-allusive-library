@@ -1,6 +1,6 @@
 -- Original library: Allusive UI Library
 -- Modified by @blankfelony
--- v1.1
+-- v1.2
 
 local cloneref = cloneref or function(obj)
 	return obj
@@ -431,12 +431,12 @@ function Library.new(opts)
 
 	local title = label({
 		Text = opts.title or "Allusive",
-		TextSize = 13,
+		TextSize = 15,
 		TextColor3 = Theme.Accent,
 		TextTransparency = 0.2,
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 40, 0.5, opts.subtitle and -7 or 0),
-		Size = UDim2.new(1, -110, 0, 14),
+		Position = UDim2.new(0, 40, 0.5, opts.subtitle and -8 or 0),
+		Size = UDim2.new(1, -110, 0, 16),
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		Parent = topbar,
 	})
@@ -449,12 +449,13 @@ function Library.new(opts)
 	if opts.subtitle then
 		label({
 			Text = opts.subtitle,
-			TextSize = 10,
+			FontFace = Fonts.Regular,
+			TextSize = 12,
 			TextColor3 = Theme.Accent,
 			TextTransparency = 0.6,
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 40, 0.5, 8),
-			Size = UDim2.new(1, -110, 0, 12),
+			Position = UDim2.new(0, 40, 0.5, 9),
+			Size = UDim2.new(1, -110, 0, 14),
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			Parent = topbar,
 		})
@@ -1099,6 +1100,139 @@ function Section:create_keybind(opts)
 	end))
 
 	return keybind
+end
+
+-- opts.options can be a list of strings or a function returning one; a function is called every
+-- time the dropdown opens, so the list can change (e.g. things the player owns)
+function Section:create_dropdown(opts)
+	local row = self:_row()
+	create("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = row })
+
+	local top = create("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+		Parent = row,
+	})
+	local _, titleLabel = info(top, opts.title, opts.description, 140)
+
+	local placeholder = opts.placeholder or "Select"
+	local frame, text = pill(top, placeholder .. "  ▾")
+	frame.ClipsDescendants = true
+	create("UISizeConstraint", { MaxSize = Vector2.new(130, 18), Parent = frame })
+
+	local button = overlay(top)
+	hover(button, row, titleLabel)
+
+	local listFrame = create("Frame", {
+		Size = UDim2.new(1, 0, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Visible = false,
+		LayoutOrder = 2,
+		Parent = row,
+	}, { list(4) })
+
+	local dropdown = { value = nil }
+	local open = false
+	local setOpen
+
+	local function items()
+		local o = opts.options
+		if type(o) == "function" then
+			local ok, result = pcall(o)
+			o = ok and result or {}
+		end
+		return o or {}
+	end
+
+	local function rebuild()
+		for _, child in ipairs(listFrame:GetChildren()) do
+			if child:IsA("GuiObject") then
+				child:Destroy()
+			end
+		end
+		local entries = items()
+		if #entries == 0 then
+			label({
+				Text = opts.empty or "Nothing to pick yet.",
+				FontFace = Fonts.Regular,
+				TextSize = 12,
+				TextColor3 = Theme.SubText,
+				TextTransparency = 0.3,
+				Size = UDim2.new(1, 0, 0, 22),
+				Parent = listFrame,
+			})
+		end
+		for i, item in ipairs(entries) do
+			local selected = item == dropdown.value
+			local option = create("TextButton", {
+				Text = "",
+				AutoButtonColor = false,
+				BackgroundColor3 = Theme.Element,
+				BackgroundTransparency = selected and 0.3 or 0.75,
+				Size = UDim2.new(1, 0, 0, 26),
+				LayoutOrder = i,
+				Parent = listFrame,
+			}, { corner(4), padding(0, 0, 10, 10) })
+			label({
+				Text = item,
+				FontFace = selected and Fonts.Bold or Fonts.Regular,
+				TextSize = 13,
+				TextColor3 = selected and Theme.Accent or Theme.Text,
+				TextTransparency = selected and 0 or 0.25,
+				TextTruncate = Enum.TextTruncate.AtEnd,
+				Size = UDim2.fromScale(1, 1),
+				Parent = option,
+			})
+			option.MouseEnter:Connect(function()
+				tween(option, 0.25, { BackgroundTransparency = selected and 0.2 or 0.5 })
+			end)
+			option.MouseLeave:Connect(function()
+				tween(option, 0.25, { BackgroundTransparency = selected and 0.3 or 0.75 })
+			end)
+			option.MouseButton1Click:Connect(function()
+				dropdown:set(item)
+				setOpen(false)
+			end)
+		end
+	end
+
+	setOpen = function(value)
+		open = value
+		if value then
+			rebuild()
+		end
+		listFrame.Visible = value
+		text.Text = (dropdown.value or placeholder) .. (value and "  ▴" or "  ▾")
+	end
+
+	function dropdown:set(value, silent)
+		self.value = value
+		text.Text = (value or placeholder) .. (open and "  ▴" or "  ▾")
+		if not silent and opts.callback then
+			task.spawn(opts.callback, value)
+		end
+	end
+
+	function dropdown:refresh()
+		if open then
+			rebuild()
+		end
+	end
+
+	button.MouseButton1Click:Connect(function()
+		frame.BackgroundTransparency = 0.5
+		tween(frame, 0.4, { BackgroundTransparency = 0.85 })
+		setOpen(not open)
+	end)
+
+	if opts.default then
+		dropdown:set(opts.default, true)
+	end
+
+	return dropdown
 end
 
 function Section:create_stats(stats)

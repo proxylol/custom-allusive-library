@@ -26,8 +26,8 @@ local Theme = {
 }
 
 local Fonts = {
-	Bold = Font.new("rbxasset://fonts/families/Montserrat.json", Enum.FontWeight.SemiBold),
-	Regular = Font.new("rbxasset://fonts/families/Montserrat.json", Enum.FontWeight.Medium),
+	Bold = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Bold),
+	Regular = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Medium),
 	Mono = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 }
 

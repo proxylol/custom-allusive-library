@@ -1,6 +1,6 @@
--- Original library: Allusive UI Library
+-- Original library: Allusive
 -- Modified by @blankfelony
--- v1.2.1
+-- v1.2.1 
 
 local cloneref = cloneref or function(obj)
 	return obj

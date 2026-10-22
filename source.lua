@@ -1,6 +1,6 @@
 -- Original library: Allusive UI Library
 -- Modified by @blankfelony
--- v1.2
+-- v1.2.1
 
 local cloneref = cloneref or function(obj)
 	return obj
@@ -1118,7 +1118,7 @@ function Section:create_dropdown(opts)
 	local _, titleLabel = info(top, opts.title, opts.description, 140)
 
 	local placeholder = opts.placeholder or "Select"
-	local frame, text = pill(top, placeholder .. "  ▾")
+	local frame, text = pill(top, placeholder)
 	frame.ClipsDescendants = true
 	create("UISizeConstraint", { MaxSize = Vector2.new(130, 18), Parent = frame })
 
@@ -1205,12 +1205,12 @@ function Section:create_dropdown(opts)
 			rebuild()
 		end
 		listFrame.Visible = value
-		text.Text = (dropdown.value or placeholder) .. (value and "  ▴" or "  ▾")
+		text.Text = dropdown.value or placeholder
 	end
 
 	function dropdown:set(value, silent)
 		self.value = value
-		text.Text = (value or placeholder) .. (open and "  ▴" or "  ▾")
+		text.Text = value or placeholder
 		if not silent and opts.callback then
 			task.spawn(opts.callback, value)
 		end

@@ -1,5 +1,6 @@
 -- Original library: Allusive UI Library
 -- Modified by @blankfelony
+-- v1.1
 
 local cloneref = cloneref or function(obj)
 	return obj
@@ -26,7 +27,7 @@ local Theme = {
 }
 
 local Fonts = {
-	Bold = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Bold),
+	Bold = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.SemiBold),
 	Regular = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Medium),
 	Mono = Font.new("rbxasset://fonts/families/RobotoMono.json"),
 }
@@ -304,7 +305,7 @@ function Library.notify(selfOrOpts, maybeOpts)
 
 	label({
 		Text = opts.title or "Notification",
-		TextSize = 12,
+		TextSize = 14,
 		TextColor3 = Theme.Accent,
 		Position = UDim2.fromOffset(8, 0),
 		Size = UDim2.new(1, -8, 1, 0),
@@ -316,7 +317,7 @@ function Library.notify(selfOrOpts, maybeOpts)
 		label({
 			Text = opts.text,
 			FontFace = Fonts.Regular,
-			TextSize = 11,
+			TextSize = 13,
 			TextColor3 = Theme.SubText,
 			TextWrapped = true,
 			Size = UDim2.new(1, 0, 0, 0),
@@ -741,10 +742,10 @@ function Tab:create_section(name)
 
 	label({
 		Text = name,
-		TextSize = 11,
+		TextSize = 13,
 		TextColor3 = Theme.Accent,
 		TextTransparency = 0.3,
-		Size = UDim2.new(1, 0, 0, 14),
+		Size = UDim2.new(1, 0, 0, 16),
 		LayoutOrder = 1,
 		Parent = holder,
 	})
@@ -784,9 +785,9 @@ local function info(parent, titleText, descText, rightSpace, order)
 
 	local titleLabel = label({
 		Text = titleText or "",
-		TextSize = 12,
+		TextSize = 15,
 		TextTransparency = 0.15,
-		Size = UDim2.new(1, 0, 0, 14),
+		Size = UDim2.new(1, 0, 0, 18),
 		TextTruncate = Enum.TextTruncate.AtEnd,
 		LayoutOrder = 1,
 		Parent = holder,
@@ -796,7 +797,8 @@ local function info(parent, titleText, descText, rightSpace, order)
 	if descText and descText ~= "" then
 		descLabel = label({
 			Text = descText,
-			TextSize = 10,
+			FontFace = Fonts.Regular,
+			TextSize = 13,
 			TextColor3 = Theme.Accent,
 			TextTransparency = 0.5,
 			TextWrapped = true,
@@ -846,7 +848,7 @@ local function pill(parent, text)
 
 	local text = label({
 		Text = text,
-		TextSize = 10,
+		TextSize = 12,
 		TextColor3 = Theme.Accent,
 		Size = UDim2.new(0, 0, 1, 0),
 		AutomaticSize = Enum.AutomaticSize.X,
@@ -1123,10 +1125,11 @@ function Section:create_stats(stats)
 
 		label({
 			Text = s.title or "",
-			TextSize = 10,
+			FontFace = Fonts.Regular,
+			TextSize = 12,
 			TextColor3 = Theme.Accent,
 			TextTransparency = 0.5,
-			Size = UDim2.new(1, 0, 0, 12),
+			Size = UDim2.new(1, 0, 0, 14),
 			TextTruncate = Enum.TextTruncate.AtEnd,
 			Parent = box,
 		})
